@@ -36,7 +36,7 @@ public:
 
     // UML-required member variables
     std::pair<T, int> *m_array;
-    std::pair<T, int> *latestInserted;
+    std::pair<T, int> *latestModified;
 
 
     // student-made member variables
@@ -86,13 +86,13 @@ void Heap<T>::Insert(T &insertable) {
     //the second value is because we are inserting int o the end of the other heap
     //it will be modified when percolate up is called
 
-    cout << "Just inserted " << insertable << endl;
-    cout << "other index is " << otherHeap->currentLocation << endl;
+//    cout << "Just inserted " << insertable << endl;
+//    cout << "other index is " << otherHeap->currentLocation << endl;
 
 
     m_array[currentLocation] = myPair;
     m_array[currentLocation].second = otherHeap->currentLocation;
-    latestInserted = &m_array[currentLocation];
+    latestModified = &m_array[currentLocation];
 
 }
 
@@ -108,9 +108,14 @@ void Heap<T>::PercolateUp() {
         m_array[hole] = m_array[hole / 2];
         //if we swap, we go over to its twin, and set its second value to be updated
         otherHeap->m_array[hole].second = hole;
+
+        latestModified = &m_array[hole];//used for debugging
+        otherHeap->latestModified = &otherHeap->m_array[hole]; //used for debugging
     }
     m_array[hole] = latest;
     otherHeap->m_array[latest.second].second = hole;
+    latestModified = &m_array[hole];//used for debugging
+    otherHeap->latestModified = &otherHeap->m_array[hole];//used for debugging
 }
 
 template<class T>
@@ -289,8 +294,8 @@ const MinMaxHeap<T> &MinMaxHeap<T>::operator=(const MinMaxHeap<T> &rhs) {
 
     delete this;
 
-    this = new MinMaxHeap<T>(rhs);
-    return *this;
+    MinMaxHeap* temp = new MinMaxHeap<T>(rhs);
+    return *temp;
 
 
 }
@@ -308,7 +313,7 @@ T MinMaxHeap<T>::deleteMin() {
     }
 
     // get info from teh node that we just deleted
-    myMinHeap->m_array[0] = myMinHeap->m_array[1].first;
+    myMinHeap->m_array[0].first = myMinHeap->m_array[1].first;
     int twinLocation = myMinHeap->m_array[1].second;
 
 
@@ -333,7 +338,7 @@ T MinMaxHeap<T>::deleteMin() {
 
     //we dont return a temp variable because it would be destroyed after
     //the function runs
-    return myMinHeap->m_array[0];
+    return myMinHeap->m_array[0].first;
 }
 
 template<class T>
@@ -343,7 +348,7 @@ T MinMaxHeap<T>::deleteMax() {
     }
 
     // get info from teh node that we just deleted
-    myMaxHeap->m_array[0] = myMaxHeap->m_array[1].first;
+    myMaxHeap->m_array[0].first = myMaxHeap->m_array[1].first;
     int twinLocation = myMaxHeap->m_array[1].second;
 
 
@@ -367,18 +372,18 @@ T MinMaxHeap<T>::deleteMax() {
 
     //we dont return a temp variable because it would be destroyed after
     //the function runs
-    return myMaxHeap->m_array[0];
+    return myMaxHeap->m_array[0].first;
 }
 
 template<class T>
 void MinMaxHeap<T>::locateMin(int pos, T &data, int &index) {
-    data = myMinHeap->m_array[1];
+    data = myMinHeap->m_array[1].first;
     index = myMinHeap->m_array->second;
 }
 
 template<class T>
 void MinMaxHeap<T>::locateMax(int pos, T &data, int &index) {
-    data = myMaxHeap->m_array[1];
+    data = myMaxHeap->m_array[1].first;
     index = myMaxHeap->m_array->second;
 }
 
